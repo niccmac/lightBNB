@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const { pool } = require('./database');
 
 module.exports = function(router, database) {
 
@@ -27,7 +26,7 @@ module.exports = function(router, database) {
   const login = function(email, password) {
     return database.getUserWithEmail(email)
       .then(user => {
-        if (bcrypt.compareSync(password, user[0].password)) {
+        if (bcrypt.compareSync(password, user.password)) {
           return user;
         }
         return null;
