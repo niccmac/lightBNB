@@ -7,6 +7,7 @@ const pool = new Pool({
   database: 'lightbnb',
   PORT: 3000
 });
+exports.pool = pool;
 
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
@@ -19,16 +20,14 @@ const users = require('./json/users.json');
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function(email) {
-  let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);
+  const emailQuery = `SELECT users.email, users.password FROM users WHERE users.email = $1`;
+  const value = [email];
+  return pool.query(emailQuery, value).then((result) => {
+    return [result.rows[0]];
+  }).catch((err) => {
+    console.log(err.message);
+    return null;
+  });
 };
 exports.getUserWithEmail = getUserWithEmail;
 
